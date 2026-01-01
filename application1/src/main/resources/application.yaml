@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: application1
+  kafka:
+    bootstrap-servers: localhost:9092
+server:
+  port: 8080
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  otlp:
+    metrics:
+      export:
+        url: http://localhost:4318/v1/metrics
+  opentelemetry:
+    resource-attributes:
+      service.version: 1.0.0
+logging:
+  structured:
+    format:
+      console: logstash
+

@@ -17,13 +17,11 @@ public class HelloService {
     private final MeterRegistry meterRegistry;
 
     @WithSpan
-    public void sleep() throws Exception {
-        meterRegistry.counter("hello_service_sleep_called_total").increment();
+    public void process() throws Exception {
         var sleepTime = new Random().nextInt(1000);
+        meterRegistry.gauge("hello_process_time", sleepTime);
         Thread.sleep(sleepTime);
-        Span.current().setAttribute("sleepTime", sleepTime);
-
+        Span.current().setAttribute("hello_process_time", sleepTime);
         log.info("helloName in baggage 1 = {}", Baggage.current().getEntryValue("helloName"));
     }
-
 }

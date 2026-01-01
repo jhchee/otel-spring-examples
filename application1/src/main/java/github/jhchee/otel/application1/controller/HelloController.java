@@ -2,6 +2,7 @@ package github.jhchee.otel.application1.controller;
 
 import github.jhchee.otel.domain.persistence.Message;
 import github.jhchee.otel.domain.persistence.MessageRepository;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import github.jhchee.otel.application1.HelloService;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -15,6 +16,7 @@ public class HelloController {
     private final MessageRepository messageRepository;
     private final HelloService helloService;
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final MeterRegistry meterRegistry;
 
     @GetMapping("/hello")
     public String hello() {
@@ -27,7 +29,8 @@ public class HelloController {
 
     @GetMapping("/hello/{name}")
     public String helloName(@PathVariable String name) throws Exception {
-        helloService.sleep();
+        helloService.process();
+        meterRegistry.counter("hello-counter").increment();
         kafkaTemplate.send("test-otel", "Hello, " + name + "!");
         var message = new Message();
         message.setContent("Hello " + name);
