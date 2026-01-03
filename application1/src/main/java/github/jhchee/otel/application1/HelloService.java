@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.Random;
 
 @Service
@@ -18,8 +19,8 @@ public class HelloService {
 
     @WithSpan
     public void process() throws Exception {
-        var sleepTime = new Random().nextInt(1000);
-        meterRegistry.gauge("hello_process_time", sleepTime);
+        var sleepTime = new Random().nextInt(100);
+        meterRegistry.timer("hello_process_time").record(Duration.ofMillis(sleepTime));
         Thread.sleep(sleepTime);
         Span.current().setAttribute("hello_process_time", sleepTime);
         log.info("helloName in baggage 1 = {}", Baggage.current().getEntryValue("helloName"));

@@ -5,12 +5,14 @@ import github.jhchee.otel.domain.persistence.MessageRepository;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import github.jhchee.otel.application1.HelloService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Slf4j
 @RequiredArgsConstructor
 public class HelloController {
     private final MessageRepository messageRepository;
@@ -29,9 +31,12 @@ public class HelloController {
 
     @GetMapping("/hello/{name}")
     public String helloName(@PathVariable String name) throws Exception {
+        log.info("Received request for name: {}", name);
         helloService.process();
-        meterRegistry.counter("hello-counter").increment();
+        log.info("Sending payload for name: {}", name);
+        meterRegistry.counter("send_to_test_otel_topic").increment();
         kafkaTemplate.send("test-otel", "Hello, " + name + "!");
+        log.info("Saving message for name: {}", name);
         var message = new Message();
         message.setContent("Hello " + name);
         messageRepository.save(message);
